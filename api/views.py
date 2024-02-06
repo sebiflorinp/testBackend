@@ -22,3 +22,32 @@ class ListCreateProduct(APIView):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
+class RetrieveUpdateDeleteProduct(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            product = Product.objects.get(id=kwargs.get('id'))
+            serializer = ProductSerializer(product)
+            return Response(serializer.data)
+        except Product.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, *args, **kwargs):
+        try:
+            product = Product.objects.get(id=kwargs.get('id'))
+            serializer = ProductSerializer(product, request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+        except Product.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            product = Product.objects.get(id=kwargs.get('id'))
+            product.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Product.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
